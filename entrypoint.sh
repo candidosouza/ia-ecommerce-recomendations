@@ -8,7 +8,7 @@ if [[ ! -f package.json ]]; then
   exec tail -f /dev/null
 fi
 
-if [[ ! -d node_modules || ! -x node_modules/.bin/vite ]]; then
+if [[ ! -d node_modules ]] || [[ ! -x node_modules/.bin/vite ]] || [[ ! -x node_modules/.bin/vitest ]]; then
   if [[ -f package-lock.json ]]; then
     npm ci
   else

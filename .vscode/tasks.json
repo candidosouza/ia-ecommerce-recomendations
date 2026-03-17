@@ -1,28 +1,28 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "Start E-commerce App",
-			"type": "shell",
-			"command": "npm run dev",
-			"group": "build",
-			"isBackground": true,
-			"problemMatcher": []
-		},
-		{
-			"label": "Run Tests",
-			"type": "shell",
-			"command": "npm run test",
-			"group": "test",
-			"problemMatcher": []
-		},
-		{
-			"label": "Watch Tests",
-			"type": "shell",
-			"command": "npm run test:watch",
-			"group": "test",
-			"isBackground": true,
-			"problemMatcher": []
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start E-commerce App",
+      "type": "shell",
+      "command": "npm run dev",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "npm run test",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Watch Tests",
+      "type": "shell",
+      "command": "npm run test:watch",
+      "group": "test",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
 }
