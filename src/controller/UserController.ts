@@ -1,6 +1,6 @@
 import type Events from '../events/events';
-import type { Product, User } from '../types';
 import type { UserService } from '../service/UserService';
+import type { Product, User } from '../types';
 import type { UserView } from '../view/UserView';
 
 export class UserController {
@@ -8,7 +8,15 @@ export class UserController {
   #userView: UserView;
   #events: typeof Events;
 
-  constructor({ userView, userService, events }: { userView: UserView; userService: UserService; events: typeof Events }) {
+  constructor({
+    userView,
+    userService,
+    events
+  }: {
+    userView: UserView;
+    userService: UserService;
+    events: typeof Events;
+  }) {
     this.#userView = userView;
     this.#userService = userService;
     this.#events = events;
@@ -58,7 +66,13 @@ export class UserController {
     this.#events.dispatchUsersUpdated({ users: await this.#userService.getUsers() });
   }
 
-  private async handlePurchaseRemove({ userId, product }: { userId: number | null; product: Product }) {
+  private async handlePurchaseRemove({
+    userId,
+    product
+  }: {
+    userId: number | null;
+    product: Product;
+  }) {
     if (!userId) return;
 
     const user = await this.#userService.getUserById(userId);

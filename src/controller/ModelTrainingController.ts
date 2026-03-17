@@ -1,6 +1,6 @@
 import type Events from '../events/events';
-import type { TrainingProgress, User } from '../types';
 import type { UserService } from '../service/UserService';
+import type { TrainingProgress, User } from '../types';
 import type { ModelView } from '../view/ModelTrainingView';
 
 export class ModelController {

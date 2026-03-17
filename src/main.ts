@@ -1,16 +1,17 @@
 import '../style.css';
-import { UserController } from './controller/UserController';
-import { ProductController } from './controller/ProductController';
 import { ModelController } from './controller/ModelTrainingController';
+import { ProductController } from './controller/ProductController';
 import { TFVisorController } from './controller/TFVisorController';
+import { UserController } from './controller/UserController';
 import { WorkerController } from './controller/WorkerController';
 import Events from './events/events';
-import { UserService } from './service/UserService';
 import { ProductService } from './service/ProductService';
-import { UserView } from './view/UserView';
-import { ProductView } from './view/ProductView';
+import { UserService } from './service/UserService';
 import { ModelView } from './view/ModelTrainingView';
+import { ProductView } from './view/ProductView';
 import { TFVisorView } from './view/TFVisorView';
+import { UserView } from './view/UserView';
+
 import type { User } from './types';
 
 const userService = new UserService();
@@ -20,7 +21,9 @@ const userView = new UserView();
 const productView = new ProductView();
 const modelView = new ModelView();
 const tfVisorView = new TFVisorView();
-const mlWorker = new Worker(new URL('./workers/modelTrainingWorker.ts', import.meta.url), { type: 'module' });
+const mlWorker = new Worker(new URL('./workers/modelTrainingWorker.ts', import.meta.url), {
+  type: 'module'
+});
 
 async function bootstrap() {
   const workerController = WorkerController.init({

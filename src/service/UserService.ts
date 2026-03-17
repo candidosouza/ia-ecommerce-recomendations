@@ -1,4 +1,5 @@
 import defaultUsersData from '../../data/users.json';
+
 import type { User } from '../types';
 
 export class UserService {

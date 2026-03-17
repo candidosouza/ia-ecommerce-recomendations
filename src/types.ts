@@ -24,6 +24,34 @@ export interface TrainingLog {
 }
 
 export interface RecommendationsReadyPayload {
-  recommendations: Product[];
+  recommendations: RecommendedProduct[];
   user?: User;
+}
+
+export interface RecommendedProduct extends Product {
+  score: number;
+}
+
+export interface ProductVector {
+  name: string;
+  meta: Product;
+  vector: number[];
+}
+
+export interface TrainingContext {
+  ages: number[];
+  prices: number[];
+  products: Product[];
+  users: User[];
+  colorsIndex: Record<string, number>;
+  categoriesIndex: Record<string, number>;
+  productAvgAgeNorm: Record<string, number>;
+  minAge: number;
+  maxAge: number;
+  minPrice: number;
+  maxPrice: number;
+  numCategories: number;
+  numColors: number;
+  dimensions: number;
+  productVectors: ProductVector[];
 }

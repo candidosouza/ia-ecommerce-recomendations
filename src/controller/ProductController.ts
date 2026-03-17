@@ -1,6 +1,6 @@
 import type Events from '../events/events';
-import type { Product, User } from '../types';
 import type { ProductService } from '../service/ProductService';
+import type { Product, User } from '../types';
 import type { ProductView } from '../view/ProductView';
 
 export class ProductController {
@@ -24,7 +24,11 @@ export class ProductController {
     void this.init();
   }
 
-  static init(deps: { productView: ProductView; events: typeof Events; productService: ProductService }) {
+  static init(deps: {
+    productView: ProductView;
+    events: typeof Events;
+    productService: ProductService;
+  }) {
     return new ProductController(deps);
   }
 

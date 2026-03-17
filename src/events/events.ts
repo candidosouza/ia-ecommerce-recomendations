@@ -1,5 +1,12 @@
 import { events } from './constants';
-import type { Product, RecommendationsReadyPayload, TrainingLog, TrainingProgress, User } from '../types';
+
+import type {
+  Product,
+  RecommendationsReadyPayload,
+  TrainingLog,
+  TrainingProgress,
+  User
+} from '../types';
 
 type PurchaseAddedPayload = { user: User; product: Product };
 type UsersUpdatedPayload = { users: User[] };

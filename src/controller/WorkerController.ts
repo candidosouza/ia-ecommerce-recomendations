@@ -1,4 +1,5 @@
 import { workerEvents } from '../events/constants';
+
 import type Events from '../events/events';
 import type { TrainingLog, TrainingProgress, User } from '../types';
 

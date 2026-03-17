@@ -1,4 +1,5 @@
 import productsData from '../../data/products.json';
+
 import type { Product } from '../types';
 
 export class ProductService {
