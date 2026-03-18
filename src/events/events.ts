@@ -3,6 +3,7 @@ import { events } from './constants';
 import type {
   Product,
   RecommendationsReadyPayload,
+  TrainModelPayload,
   TrainingLog,
   TrainingProgress,
   User
@@ -46,11 +47,11 @@ export default class Events {
     this.dispatch(events.recommendationsReady, data);
   }
 
-  static onTrainModel(callback: (data: User[]) => void) {
+  static onTrainModel(callback: (data: TrainModelPayload) => void) {
     this.on(events.modelTrain, callback);
   }
 
-  static dispatchTrainModel(data: User[]) {
+  static dispatchTrainModel(data: TrainModelPayload) {
     this.dispatch(events.modelTrain, data);
   }
 

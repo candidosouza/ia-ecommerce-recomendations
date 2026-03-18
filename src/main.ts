@@ -26,16 +26,14 @@ const mlWorker = new Worker(new URL('./workers/modelTrainingWorker.ts', import.m
 });
 
 async function bootstrap() {
-  const workerController = WorkerController.init({
+  WorkerController.init({
     worker: mlWorker,
     events: Events
   });
 
-  const users = await userService.getDefaultUsers();
-  workerController.triggerTrain(users);
-
   ModelController.init({
     modelView,
+    productService,
     userService,
     events: Events
   });

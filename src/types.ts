@@ -13,6 +13,11 @@ export interface User {
   purchases: Product[];
 }
 
+export interface TrainModelPayload {
+  users: User[];
+  products: Product[];
+}
+
 export interface TrainingProgress {
   progress: number;
 }

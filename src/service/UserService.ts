@@ -1,43 +1,43 @@
-import defaultUsersData from '../../data/users.json';
+import { apiClient } from './apiClient';
 
 import type { User } from '../types';
 
 export class UserService {
-  #storageKey = 'ew-academy-users';
-
   async getDefaultUsers() {
-    const users = structuredClone(defaultUsersData) as User[];
-    this.#setStorage(users);
-    return users;
+    return this.getUsers();
   }
 
   async getUsers() {
-    return this.#getStorage();
+    return apiClient<User[]>('/users');
   }
 
   async getUserById(userId: number) {
-    return this.#getStorage().find((user) => user.id === userId);
+    return apiClient<User>(`/users/${userId}`);
   }
 
   async updateUser(user: User) {
-    const users = this.#getStorage();
-    const userIndex = users.findIndex((item) => item.id === user.id);
-    users[userIndex] = { ...users[userIndex], ...user };
-    this.#setStorage(users);
-    return users[userIndex];
+    return apiClient<User>(`/users/${user.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        name: user.name,
+        age: user.age,
+        purchases: user.purchases.map((product) => ({
+          id: product.id
+        }))
+      })
+    });
   }
 
   async addUser(user: User) {
-    const users = this.#getStorage();
-    this.#setStorage([user, ...users]);
-  }
-
-  #getStorage() {
-    const data = sessionStorage.getItem(this.#storageKey);
-    return data ? (JSON.parse(data) as User[]) : [];
-  }
-
-  #setStorage(data: User[]) {
-    sessionStorage.setItem(this.#storageKey, JSON.stringify(data));
+    return apiClient<User>('/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: user.name,
+        age: user.age,
+        purchases: user.purchases.map((product) => ({
+          id: product.id
+        }))
+      })
+    });
   }
 }

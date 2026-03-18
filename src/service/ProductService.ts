@@ -1,15 +1,14 @@
-import productsData from '../../data/products.json';
+import { apiClient } from './apiClient';
 
 import type { Product } from '../types';
 
 export class ProductService {
   async getProducts() {
-    return structuredClone(productsData) as Product[];
+    return apiClient<Product[]>('/products');
   }
 
   async getProductById(id: number) {
-    const products = await this.getProducts();
-    return products.find((product) => product.id === id);
+    return apiClient<Product>(`/products/${id}`);
   }
 
   async getProductsByIds(ids: number[]) {

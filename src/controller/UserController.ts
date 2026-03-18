@@ -27,9 +27,13 @@ export class UserController {
   }
 
   async renderUsers(nonTrainedUser: User) {
-    const users = await this.#userService.getDefaultUsers();
-    await this.#userService.addUser(nonTrainedUser);
-    const defaultAndNonTrained = [nonTrainedUser, ...users];
+    const users = await this.#userService.getUsers();
+    const existingDemoUser = users.find((user) => user.name === nonTrainedUser.name);
+    const demoUser = existingDemoUser ?? (await this.#userService.addUser(nonTrainedUser));
+    const defaultAndNonTrained = [
+      demoUser,
+      ...users.filter((user) => user.id !== demoUser.id)
+    ];
 
     this.#userView.renderUserOptions(defaultAndNonTrained);
     this.setupCallbacks();

@@ -1,10 +1,12 @@
 import type Events from '../events/events';
+import type { ProductService } from '../service/ProductService';
 import type { UserService } from '../service/UserService';
 import type { TrainingProgress, User } from '../types';
 import type { ModelView } from '../view/ModelTrainingView';
 
 export class ModelController {
   #modelView: ModelView;
+  #productService: ProductService;
   #userService: UserService;
   #events: typeof Events;
   #currentUser: User | null = null;
@@ -12,20 +14,28 @@ export class ModelController {
 
   constructor({
     modelView,
+    productService,
     userService,
     events
   }: {
     modelView: ModelView;
+    productService: ProductService;
     userService: UserService;
     events: typeof Events;
   }) {
     this.#modelView = modelView;
+    this.#productService = productService;
     this.#userService = userService;
     this.#events = events;
     this.init();
   }
 
-  static init(deps: { modelView: ModelView; userService: UserService; events: typeof Events }) {
+  static init(deps: {
+    modelView: ModelView;
+    productService: ProductService;
+    userService: UserService;
+    events: typeof Events;
+  }) {
     return new ModelController(deps);
   }
 
@@ -57,7 +67,8 @@ export class ModelController {
 
   private async handleTrainModel() {
     const users = await this.#userService.getUsers();
-    this.#events.dispatchTrainModel(users);
+    const products = await this.#productService.getProducts();
+    this.#events.dispatchTrainModel({ users, products });
   }
 
   private handleTrainingProgressUpdate(progress: TrainingProgress) {

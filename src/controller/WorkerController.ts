@@ -1,7 +1,7 @@
 import { workerEvents } from '../events/constants';
 
 import type Events from '../events/events';
-import type { TrainingLog, TrainingProgress, User } from '../types';
+import type { Product, TrainingLog, TrainingProgress, User } from '../types';
 
 type WorkerMessage =
   | { type: typeof workerEvents.progressUpdate; progress: TrainingProgress }
@@ -81,8 +81,8 @@ export class WorkerController {
     };
   }
 
-  triggerTrain(users: User[]) {
-    this.#worker.postMessage({ action: workerEvents.trainModel, users });
+  triggerTrain({ users, products }: { users: User[]; products: Product[] }) {
+    this.#worker.postMessage({ action: workerEvents.trainModel, users, products });
   }
 
   triggerRecommend(user: User) {
