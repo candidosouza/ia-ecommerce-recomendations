@@ -22,8 +22,26 @@ type TrainingData = {
   inputDimension: number;
 };
 
+type EpochLog = {
+  loss?: number;
+  accuracy?: number;
+  acc?: number;
+};
+
+type TrainOptions = {
+  epochs?: number;
+  batchSize?: number;
+  onEpochEnd?: (epoch: number, metrics: { loss: number; accuracy: number }) => void;
+};
+
 export const normalize = (value: number, min: number, max: number) =>
   (value - min) / ((max - min) || 1);
+
+const normalizeLabel = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 
 export function makeContext(products: Product[], users: User[]): TrainingContext {
   const ages = users.map((user) => user.age);
@@ -34,8 +52,8 @@ export function makeContext(products: Product[], users: User[]): TrainingContext
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
 
-  const colors = [...new Set(products.map((product) => product.color))];
-  const categories = [...new Set(products.map((product) => product.category))];
+  const colors = [...new Set(products.map((product) => normalizeLabel(product.color)))];
+  const categories = [...new Set(products.map((product) => normalizeLabel(product.category)))];
 
   const colorsIndex = Object.fromEntries(colors.map((color, index) => [color, index]));
   const categoriesIndex = Object.fromEntries(categories.map((category, index) => [category, index]));
@@ -103,12 +121,16 @@ export function encodeProduct(product: Product, context: TrainingContextBase | T
   const age = tf.tensor1d([(context.productAvgAgeNorm[product.name] ?? 0.5) * WEIGHTS.age]);
 
   const category = oneHotWeighted(
-    context.categoriesIndex[product.category],
+    context.categoriesIndex[normalizeLabel(product.category)],
     context.numCategories,
     WEIGHTS.category
   );
 
-  const color = oneHotWeighted(context.colorsIndex[product.color], context.numColors, WEIGHTS.color);
+  const color = oneHotWeighted(
+    context.colorsIndex[normalizeLabel(product.color)],
+    context.numColors,
+    WEIGHTS.color
+  );
 
   return tf.concat1d([price, age, category, color] as tf.Tensor1D[]);
 }
@@ -158,7 +180,7 @@ export function createTrainingData(context: TrainingContext): TrainingData {
 
 export async function configureNeuralNetAndTrain(
   trainData: TrainingData,
-  options: { epochs?: number; batchSize?: number } = {}
+  options: TrainOptions = {}
 ) {
   const model = tf.sequential();
 
@@ -192,10 +214,21 @@ export async function configureNeuralNetAndTrain(
     metrics: ['accuracy']
   });
 
+  const resolveAccuracy = (logs?: EpochLog) => logs?.accuracy ?? logs?.acc ?? 0;
+  const resolveLoss = (logs?: EpochLog) => logs?.loss ?? 0;
+
   await model.fit(trainData.xs, trainData.ys, {
     epochs: options.epochs ?? 100,
     batchSize: options.batchSize ?? 32,
-    shuffle: true
+    shuffle: true,
+    callbacks: {
+      onEpochEnd: async (epoch, logs) => {
+        options.onEpochEnd?.(epoch + 1, {
+          loss: resolveLoss(logs),
+          accuracy: resolveAccuracy(logs)
+        });
+      }
+    }
   });
 
   return model;

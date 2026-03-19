@@ -1,6 +1,4 @@
 /// <reference lib="webworker" />
-
-import productsData from '../../data/products.json';
 import { workerEvents } from '../events/constants';
 
 import type { Product, TrainingContext, User } from '../types';
@@ -12,7 +10,7 @@ import {
   recommendProducts
 } from './recommendationEngine';
 
-type TrainMessage = { action: typeof workerEvents.trainModel; users: User[] };
+type TrainMessage = { action: typeof workerEvents.trainModel; users: User[]; products: Product[] };
 type RecommendMessage = { action: typeof workerEvents.recommend; user: User };
 type WorkerInputMessage = TrainMessage | RecommendMessage;
 
@@ -22,27 +20,34 @@ const send = <T>(message: T) => {
 
 let globalContext: TrainingContext | null = null;
 let model: Awaited<ReturnType<typeof configureNeuralNetAndTrain>> | null = null;
+const TRAINING_EPOCHS = 100;
 
-async function trainModel({ users }: { users: User[] }) {
+async function trainModel({ users, products }: { users: User[]; products: Product[] }) {
   console.log('Training model with users:', users);
 
   send({ type: workerEvents.progressUpdate, progress: { progress: 1 } });
 
-  const catalog: Product[] = productsData as Product[];
-  const context = makeContext(catalog, users);
+  const context = makeContext(products, users);
   globalContext = context;
 
   const trainingData = createTrainingData(context);
-  model = await configureNeuralNetAndTrain(trainingData);
+  model = await configureNeuralNetAndTrain(trainingData, {
+    epochs: TRAINING_EPOCHS,
+    onEpochEnd: (epoch, metrics) => {
+      send({
+        type: workerEvents.trainingLog,
+        epoch,
+        loss: metrics.loss,
+        accuracy: metrics.accuracy
+      });
 
-  send({
-    type: workerEvents.trainingLog,
-    epoch: 100,
-    loss: 0,
-    accuracy: 1
+      send({
+        type: workerEvents.progressUpdate,
+        progress: { progress: Math.round((epoch / TRAINING_EPOCHS) * 100) }
+      });
+    }
   });
 
-  send({ type: workerEvents.progressUpdate, progress: { progress: 100 } });
   send({ type: workerEvents.trainingComplete });
 }
 
