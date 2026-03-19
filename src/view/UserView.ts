@@ -1,5 +1,6 @@
-import { View } from './View';
 import pastPurchaseTemplate from './templates/past-purchase.html?raw';
+import { View } from './View';
+
 import type { Product, User } from '../types';
 
 type PurchaseRemovePayload = { element: HTMLElement; userId: number | null; product: Product };
@@ -27,7 +28,9 @@ export class UserView extends View {
   renderUserOptions(users: User[]) {
     if (!this.#userSelect) return;
 
-    const options = users.map((user) => `<option value="${user.id}">${user.name}</option>`).join('');
+    const options = users
+      .map((user) => `<option value="${user.id}">${user.name}</option>`)
+      .join('');
     this.#userSelect.innerHTML = '<option value="">-- Select a user --</option>' + options;
   }
 
@@ -45,12 +48,14 @@ export class UserView extends View {
       return;
     }
 
-    const html = pastPurchases.map((product) =>
-      this.replaceTemplate(pastPurchaseTemplate, {
-        ...product,
-        product: JSON.stringify(product)
-      })
-    ).join('');
+    const html = pastPurchases
+      .map((product) =>
+        this.replaceTemplate(pastPurchaseTemplate, {
+          ...product,
+          product: encodeURIComponent(JSON.stringify(product))
+        })
+      )
+      .join('');
 
     this.#pastPurchasesList.innerHTML = html;
     this.attachPurchaseClickHandlers();
@@ -65,12 +70,13 @@ export class UserView extends View {
 
     const purchaseHtml = this.replaceTemplate(pastPurchaseTemplate, {
       ...product,
-      product: JSON.stringify(product)
+      product: encodeURIComponent(JSON.stringify(product))
     });
 
     this.#pastPurchasesList.insertAdjacentHTML('afterbegin', purchaseHtml);
 
-    const newPurchase = this.#pastPurchasesList.firstElementChild?.querySelector<HTMLElement>('.past-purchase');
+    const newPurchase =
+      this.#pastPurchasesList.firstElementChild?.querySelector<HTMLElement>('.past-purchase');
     if (newPurchase) {
       newPurchase.classList.add('past-purchase-highlight');
       window.setTimeout(() => {
@@ -106,7 +112,9 @@ export class UserView extends View {
       purchaseElement.onclick = () => {
         if (!this.#onPurchaseRemove) return;
 
-        const product = JSON.parse(purchaseElement.dataset.product ?? '{}') as Product;
+        const product = JSON.parse(
+          decodeURIComponent(purchaseElement.dataset.product ?? '%7B%7D')
+        ) as Product;
         const userId = this.getSelectedUserId();
         const element = purchaseElement.closest<HTMLElement>('.col-md-6');
 

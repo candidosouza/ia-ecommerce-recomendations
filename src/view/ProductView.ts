@@ -1,5 +1,6 @@
-import { View } from './View';
 import productTemplate from './templates/product-card.html?raw';
+import { View } from './View';
+
 import type { Product, User } from '../types';
 
 export class ProductView extends View {
@@ -18,12 +19,14 @@ export class ProductView extends View {
   render(products: Product[], disableButtons = true) {
     if (!this.#productList) return;
 
-    const html = products.map((product) =>
-      this.replaceTemplate(productTemplate, {
-        ...product,
-        product: JSON.stringify(product)
-      })
-    ).join('');
+    const html = products
+      .map((product) =>
+        this.replaceTemplate(productTemplate, {
+          ...product,
+          product: encodeURIComponent(JSON.stringify(product))
+        })
+      )
+      .join('');
 
     this.#productList.innerHTML = html;
     this.attachBuyButtonListeners();
@@ -42,7 +45,7 @@ export class ProductView extends View {
 
     this.#buttons.forEach((button) => {
       button.addEventListener('click', () => {
-        const product = JSON.parse(button.dataset.product ?? '{}') as Product;
+        const product = JSON.parse(decodeURIComponent(button.dataset.product ?? '%7B%7D')) as Product;
         const originalText = button.innerHTML;
 
         button.innerHTML = '<i class="bi bi-check-circle-fill"></i> Added';

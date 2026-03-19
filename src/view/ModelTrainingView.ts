@@ -1,4 +1,5 @@
 import { View } from './View';
+
 import type { TrainingProgress, User } from '../types';
 
 export class ModelView extends View {
@@ -33,7 +34,8 @@ export class ModelView extends View {
     if (!this.#trainModelBtn) return;
 
     this.#trainModelBtn.disabled = true;
-    this.#trainModelBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Training...';
+    this.#trainModelBtn.innerHTML =
+      '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Training...';
 
     if (progress.progress === 100) {
       this.#trainModelBtn.disabled = false;
@@ -44,12 +46,15 @@ export class ModelView extends View {
   renderAllUsersPurchases(users: User[]) {
     if (!this.#allUsersPurchasesList) return;
 
-    const html = users.map((user) => {
-      const purchasesHtml = user.purchases.map((purchase) =>
-        `<span class="badge bg-light text-dark me-1 mb-1">${purchase.name}</span>`
-      ).join('');
+    const html = users
+      .map((user) => {
+        const purchasesHtml = user.purchases
+          .map(
+            (purchase) => `<span class="badge bg-light text-dark me-1 mb-1">${purchase.name}</span>`
+          )
+          .join('');
 
-      return `
+        return `
         <div class="user-purchase-summary">
           <h6>${user.name} (Age: ${user.age})</h6>
           <div class="purchases-badges">
@@ -57,7 +62,8 @@ export class ModelView extends View {
           </div>
         </div>
       `;
-    }).join('');
+      })
+      .join('');
 
     this.#allUsersPurchasesList.innerHTML = html;
   }

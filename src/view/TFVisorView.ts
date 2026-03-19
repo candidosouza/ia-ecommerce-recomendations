@@ -1,5 +1,7 @@
 import * as tfvis from '@tensorflow/tfjs-vis';
+
 import { View } from './View';
+
 import type { TrainingLog } from '../types';
 
 export class TFVisorView extends View {
