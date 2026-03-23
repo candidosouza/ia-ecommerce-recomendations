@@ -24,7 +24,7 @@ describe('Events', () => {
 
   it('dispatcha e escuta recommendations:ready', () => {
     const callback = vi.fn();
-    const payload = { recommendations: [makeProduct()] };
+    const payload = { recommendations: [{ ...makeProduct(), score: 0.95 }] };
 
     Events.onRecommendationsReady(callback);
     Events.dispatchRecommendationsReady(payload);

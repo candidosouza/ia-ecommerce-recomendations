@@ -42,12 +42,14 @@ describe('WorkerController', () => {
 
     const onTrainCallback = events.onTrainModel.mock.calls[0][0];
     const users = [makeUser()];
+    const products = [makeProduct()];
 
-    onTrainCallback(users);
+    onTrainCallback({ users, products });
 
     expect(worker.postMessage).toHaveBeenCalledWith({
       action: workerEvents.trainModel,
-      users
+      users,
+      products
     });
   });
 

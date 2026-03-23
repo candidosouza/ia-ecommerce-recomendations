@@ -5,13 +5,14 @@ describe('UserController', () => {
   it('renderiza usuarios e publica users:updated', async () => {
     const defaultUsers = [makeUser({ id: 10 }), makeUser({ id: 11 })];
     const nonTrainedUser = makeUser({ id: 99, name: 'Nao Treinado' });
+    const createdDemoUser = makeUser({ id: 999, name: 'Nao Treinado' });
 
     const userService = {
-      getDefaultUsers: vi.fn().mockResolvedValue(defaultUsers),
-      addUser: vi.fn().mockResolvedValue(undefined),
+      getDefaultUsers: vi.fn(),
+      addUser: vi.fn().mockResolvedValue(createdDemoUser),
       getUserById: vi.fn(),
       updateUser: vi.fn(),
-      getUsers: vi.fn()
+      getUsers: vi.fn().mockResolvedValue(defaultUsers)
     };
 
     const userView = {
@@ -38,9 +39,9 @@ describe('UserController', () => {
 
     await controller.renderUsers(nonTrainedUser);
 
-    expect(userView.renderUserOptions).toHaveBeenCalledWith([nonTrainedUser, ...defaultUsers]);
+    expect(userView.renderUserOptions).toHaveBeenCalledWith([createdDemoUser, ...defaultUsers]);
     expect(events.dispatchUsersUpdated).toHaveBeenCalledWith({
-      users: [nonTrainedUser, ...defaultUsers]
+      users: [createdDemoUser, ...defaultUsers]
     });
   });
 
@@ -49,8 +50,8 @@ describe('UserController', () => {
     const user = makeUser({ purchases: [] });
 
     const userService = {
-      getDefaultUsers: vi.fn().mockResolvedValue([]),
-      addUser: vi.fn().mockResolvedValue(undefined),
+      getDefaultUsers: vi.fn(),
+      addUser: vi.fn().mockResolvedValue(makeUser({ id: 99 })),
       getUserById: vi.fn().mockResolvedValue(user),
       updateUser: vi.fn().mockResolvedValue({ ...user, purchases: [product] }),
       getUsers: vi.fn().mockResolvedValue([{ ...user, purchases: [product] }])
