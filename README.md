@@ -1,48 +1,122 @@
-# Sistema de Recomendação para E-commerce
+# Sistema de Recomendacao para E-commerce com IA
 
-Aplicação web de estudo para simular um fluxo de recomendação de produtos em e-commerce com foco em organização de frontend, uso de Web Workers e integração com TensorFlow.js no navegador.
+Aplicacao web de estudo para recomendacao de produtos em e-commerce, com frontend em `TypeScript`, treinamento no navegador com `TensorFlow.js`, backend em `Node.js`, persistencia em `PostgreSQL` e modelagem com `Prisma`.
 
-O projeto exibe usuários, catálogo de produtos, histórico de compras e um fluxo de treinamento de modelo com visualização de métricas. A implementação atual foi migrada para `Vite + TypeScript`, preservando a arquitetura modular original baseada em `controllers`, `services`, `views` e `workers`.
+O projeto evoluiu de uma base local com JSON para uma arquitetura mais profissional, com:
+
+- frontend separado
+- API REST
+- banco relacional
+- migrations versionadas
+- seed idempotente com dados fake
+- ambiente completo via `Docker Compose`
 
 ## Objetivo
 
-Este projeto foi construído para estudar:
+Este projeto foi construído para estudar, de forma aplicada:
 
-- organização de aplicações frontend sem backend dedicado
-- tipagem com TypeScript em aplicações web modulares
-- uso de `Web Workers` para processamento assíncrono
-- visualização de treinamento com `TensorFlow.js` e `tfjs-vis`
-- simulação de recomendação de produtos a partir de dados de usuários
+- arquitetura frontend modular sem framework pesado
+- tipagem com `TypeScript`
+- recomendacao de produtos com `TensorFlow.js`
+- processamento assíncrono com `Web Workers`
+- persistencia relacional com `PostgreSQL`
+- modelagem e migrations com `Prisma`
+- qualidade com testes, lint e formatacao
+- orquestracao local com `Docker`
 
-## Stack Utilizada
+## Arquitetura Atual
+
+O sistema agora esta dividido em tres partes principais:
+
+### 1. Frontend
+
+Aplicacao Vite em `TypeScript`, responsiva, organizada em:
+
+- `controllers`
+- `services`
+- `views`
+- `events`
+- `workers`
+
+Responsabilidades:
+
+- carregar usuarios e produtos via API
+- registrar compras do usuario
+- treinar o modelo no navegador
+- exibir recomendacoes e graficos
+
+### 2. API
+
+Backend em `Node.js + Express + TypeScript`, organizado por modulos:
+
+- `products`
+- `users`
+
+Responsabilidades:
+
+- expor endpoints REST
+- persistir usuarios, produtos e compras
+- validar payloads
+- entregar dados ao frontend no formato esperado
+
+### 3. Banco de Dados
+
+Banco `PostgreSQL` com modelagem relacional.
+
+Responsabilidades:
+
+- armazenar usuarios
+- armazenar produtos
+- armazenar historico de compras
+- servir como base persistente da aplicacao
+
+## Stack Tecnologica
+
+### Frontend
 
 - `Node.js 22`
 - `Vite`
 - `TypeScript`
-- `Vitest`
-- `jsdom`
 - `TensorFlow.js`
 - `TensorFlow.js Vis`
 - `Bootstrap 5`
-- `Docker` e `Docker Compose`
+- `Vitest`
+- `jsdom`
+- `ESLint`
+- `Prettier`
 
-## Arquitetura Atual
+### Backend
 
-O projeto segue uma separação simples por responsabilidade:
+- `Node.js 22`
+- `Express`
+- `TypeScript`
+- `Prisma`
+- `Zod`
+- `@faker-js/faker`
 
-- `controllers`: coordenam fluxo de tela, eventos e regras de interação
-- `services`: acesso a dados locais e persistência em `sessionStorage`
-- `views`: renderização e manipulação direta do DOM
-- `events`: barramento de eventos da aplicação via `CustomEvent`
-- `workers`: processamento isolado para treino e recomendação
-- `data`: base local em JSON para usuários e produtos
+### Infraestrutura
 
-Essa arquitetura é adequada para um projeto de estudo de pequeno e médio porte. Ela mantém clareza suficiente sem introduzir a complexidade de um framework completo como React.
+- `PostgreSQL 16`
+- `Docker`
+- `Docker Compose`
 
 ## Estrutura do Projeto
 
 ```text
 ia-ecommerce-recomendations/
+├── api/
+│   ├── prisma/
+│   │   ├── migrations/
+│   │   ├── schema.prisma
+│   │   └── seed.ts
+│   ├── src/
+│   │   ├── config/
+│   │   ├── lib/
+│   │   └── modules/
+│   ├── Dockerfile
+│   ├── entrypoint.sh
+│   ├── package.json
+│   └── tsconfig.json
 ├── data/
 │   ├── products.json
 │   └── users.json
@@ -52,286 +126,311 @@ ia-ecommerce-recomendations/
 │   ├── service/
 │   ├── test/
 │   ├── view/
-│   │   └── templates/
 │   ├── workers/
 │   ├── main.ts
-│   ├── types.ts
-│   └── vite-env.d.ts
-├── coverage/
+│   └── types.ts
 ├── Dockerfile
 ├── docker-compose.yml
 ├── entrypoint.sh
 ├── index.html
-├── package.json
 ├── style.css
-├── tsconfig.json
+├── package.json
 └── vite.config.ts
 ```
 
-## Requisitos
+## Modelagem do Banco
 
-Para executar o projeto localmente, você precisa ter instalado:
+O banco foi modelado com tres entidades principais:
 
-- `Node.js 22` ou superior
-- `npm`
-- `Docker`
-- `Docker Compose`
+### `User`
 
-## Execução Local
+- `id`
+- `name`
+- `age`
+- `createdAt`
+- `updatedAt`
 
-Instale as dependências:
+### `Product`
 
-```bash
-npm install
-```
+- `id`
+- `name`
+- `category`
+- `price`
+- `color`
+- `createdAt`
+- `updatedAt`
 
-Inicie o servidor de desenvolvimento:
+### `Purchase`
 
-```bash
-npm start
-```
+- `id`
+- `userId`
+- `productId`
+- `createdAt`
 
-Abra no navegador:
+Relacoes:
 
-```text
-http://localhost:3000
-```
+- um usuario pode ter muitas compras
+- um produto pode aparecer em muitas compras
+- cada compra liga um usuario a um produto
 
-## Execução com Docker
+## Seed Profissional
 
-Na raiz do projeto, execute:
+O projeto agora possui um seed idempotente em [api/prisma/seed.ts](/home/candido/study/ia-engineer/ia-ecommerce-recomendations/api/prisma/seed.ts).
+
+Ele faz o seguinte:
+
+- limpa os dados anteriores
+- popula produtos base
+- cria produtos extras com `faker`
+- popula usuarios base
+- cria usuarios adicionais com dados fake
+- gera compras relacionadas para treino e recomendacao
+- reajusta as sequences do PostgreSQL apos inserts explicitos
+
+Isso permite:
+
+- ambiente reproduzivel
+- dados consistentes para estudo
+- reset seguro do banco em ambiente local
+
+## Endpoints da API
+
+### Healthcheck
+
+- `GET /health`
+
+### Produtos
+
+- `GET /api/products`
+- `GET /api/products/:id`
+
+### Usuarios
+
+- `GET /api/users`
+- `GET /api/users/:id`
+- `POST /api/users`
+- `PUT /api/users/:id`
+
+## Fluxo Funcional
+
+1. O frontend carrega usuarios e produtos a partir da API.
+2. O usuario seleciona um perfil na interface.
+3. O historico de compras e o catalogo sao exibidos.
+4. Novas compras podem ser adicionadas.
+5. As compras persistem no banco por meio da API.
+6. O treinamento do modelo e feito no navegador via `Web Worker`.
+7. As recomendacoes sao calculadas com base no contexto dos usuarios e produtos.
+8. O `tfjs-vis` exibe dados de treino ao longo das epocas.
+
+## Responsividade
+
+A interface foi ajustada para uso real em:
+
+- `desktop`
+- `tablet`
+- `mobile`
+
+Pontos tratados:
+
+- grade principal adaptavel
+- cards com largura fluida
+- botoes empilhando em telas menores
+- listagens de produtos e compras com leitura melhor
+- hero e secoes reorganizados para navegacao mobile
+
+## Execucao com Docker
+
+Subir todo o ambiente:
 
 ```bash
 docker compose up --build -d
 ```
 
-Abra no navegador:
+Servicos disponiveis:
 
-```text
-http://localhost:3000
-```
+- frontend: `http://localhost:3000`
+- api: `http://localhost:4000`
+- postgres: `localhost:5432`
 
-Para acessar o container:
+Entrar no frontend:
 
 ```bash
 docker compose exec app bash
 ```
 
-Para acompanhar os logs:
+Entrar na API:
 
 ```bash
-docker compose logs -f
+docker compose exec api bash
 ```
 
-Para parar o ambiente:
+Parar o ambiente:
 
 ```bash
 docker compose down
 ```
 
-## Scripts Disponíveis
-
-No [package.json](./package.json):
-
-- `npm start`: inicia o Vite em `0.0.0.0:3000`
-- `npm run dev`: alias para desenvolvimento com Vite
-- `npm run build`: executa validação TypeScript e gera build de produção
-- `npm run preview`: sobe a versão buildada localmente
-- `npm test`: executa a suíte de testes com cobertura
-- `npm run test:watch`: executa a suíte em modo watch
-- `npm run test:ui`: abre a interface visual do Vitest
-
-## Suíte de Testes
-
-O projeto possui uma suíte de testes automatizados configurada de forma compatível com a stack atual.
-
-Ferramentas utilizadas:
-
-- `Vitest` como test runner
-- `jsdom` para simulação de navegador
-- `@vitest/coverage-v8` para geração de cobertura
-- `setupTests.ts` para bootstrap de ambiente de teste
-- `factories.ts` para construção de dados reutilizáveis
-
-### Cobertura atual da suíte
-
-Neste momento, a suíte cobre principalmente:
-
-- barramento de eventos da aplicação
-- services de usuários e produtos
-- fluxo principal do `UserController`
-- integração de mensagens no `WorkerController`
-
-### Execução dos testes
-
-Executar todos os testes com cobertura:
-
-```bash
-npm test
-```
-
-Executar em modo watch:
-
-```bash
-npm run test:watch
-```
-
-Executar com interface visual:
-
-```bash
-npm run test:ui
-```
-
-### Relatórios de cobertura
-
-Após a execução dos testes, o relatório é gerado em:
-
-```text
-coverage/
-```
-
-### Estado atual da cobertura
-
-A infraestrutura de testes já está pronta e validada, mas a cobertura ainda está concentrada em `events`, `services` e alguns `controllers`.
-
-As próximas áreas recomendadas para expansão da suíte são:
-
-- `views`
-- `ModelTrainingController`
-- `ProductController`
-- `TFVisorController`
-- `modelTrainingWorker`
-
-## Como a Aplicação Funciona
-
-O fluxo principal da aplicação é:
-
-1. carregar usuários e produtos a partir dos arquivos JSON locais
-2. renderizar a interface inicial no navegador
-3. permitir seleção de usuário e registro de compras
-4. disparar eventos internos para atualizar tela e histórico
-5. acionar um `Web Worker` para simular treino e recomendação
-6. apresentar logs e visualizações de treinamento com `tfjs-vis`
-
-Atualmente, a parte de treino e recomendação está estruturada para evolução incremental. O worker já está isolado, mas a lógica de recomendação ainda é simplificada e voltada a estudo.
-
-## Persistência de Dados
-
-Os dados de usuários carregados do arquivo JSON são copiados para `sessionStorage`. Isso significa:
-
-- os dados persistem apenas durante a sessão do navegador
-- alterações feitas na interface não são gravadas de volta nos arquivos JSON
-- ao abrir uma nova sessão, os dados voltam ao estado original
-
-## Principais Arquivos
-
-- [src/main.ts](./src/main.ts): ponto de entrada da aplicação
-- [src/types.ts](./src/types.ts): contratos principais da aplicação
-- [src/controller/UserController.ts](./src/controller/UserController.ts): fluxo de usuários e compras
-- [src/controller/ProductController.ts](./src/controller/ProductController.ts): fluxo de catálogo e compra
-- [src/controller/ModelTrainingController.ts](./src/controller/ModelTrainingController.ts): controle de treino e recomendação
-- [src/controller/WorkerController.ts](./src/controller/WorkerController.ts): integração com o worker
-- [src/workers/modelTrainingWorker.ts](./src/workers/modelTrainingWorker.ts): processamento assíncrono de treino e recomendação
-- [Dockerfile](./Dockerfile): imagem base do ambiente
-- [entrypoint.sh](./entrypoint.sh): bootstrap do container
-
-## Decisões Técnicas
-
-### Por que Vite + TypeScript?
-
-Essa combinação foi adotada porque:
-
-- melhora a experiência de desenvolvimento
-- reduz atrito com módulos ES modernos
-- facilita build, hot reload e empacotamento
-- adiciona segurança de tipos sem exigir mudança completa para framework
-
-### Por que não React neste momento?
-
-Para o estado atual do projeto, a interface ainda é relativamente simples e a arquitetura atual é suficiente. Migrar para React agora aumentaria o custo de manutenção sem ganho proporcional.
-
-Se o projeto crescer em:
-
-- complexidade de estado
-- número de telas
-- composição de componentes
-- integrações externas
-
-então uma migração futura para `React + TypeScript` pode passar a fazer sentido.
-
-## Build de Produção
-
-Para gerar o build:
-
-```bash
-npm run build
-```
-
-Os arquivos gerados ficarão em:
-
-```text
-dist/
-```
-
-## Ferramentas de Desenvolvimento
-
-O projeto possui tarefas auxiliares para VS Code em [`.vscode/tasks.json`](./.vscode/tasks.json).
-
-Tarefas disponíveis:
-
-- `Start E-commerce App`: inicia a aplicação em modo desenvolvimento
-- `Run Tests`: executa a suíte completa
-- `Watch Tests`: executa a suíte em modo contínuo
-
-## Limitações Atuais
-
-- a lógica de recomendação ainda está em estágio inicial
-- o worker ainda usa um fluxo simplificado de treinamento
-- o bundle final é grande por causa das dependências de TensorFlow
-- não há backend real nem persistência em banco de dados
-
-## Próximos Passos Recomendados
-
-- evoluir a lógica real de recomendação dentro do worker
-- separar melhor o carregamento de módulos de ML para reduzir bundle
-- ampliar a cobertura de testes para views, worker e controllers restantes
-- considerar divisão por feature dentro de `src/`
-- avaliar migração para React apenas se a UI crescer de forma significativa
-
-## Comandos Úteis
-
-Reinstalar dependências:
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
-Subir o ambiente Docker do zero:
+Remover volumes e recriar do zero:
 
 ```bash
 docker compose down -v
 docker compose up --build -d
 ```
 
-Executar build manual dentro do container:
+## Execucao Local
+
+### Frontend
 
 ```bash
-docker compose exec app bash
+npm install
+npm start
+```
+
+### API
+
+```bash
+cd api
+npm install
+npm run prisma:generate
 npm run build
 ```
 
-Executar testes dentro do container:
+Para rodar localmente fora do Docker, a API precisa de um `DATABASE_URL` valido apontando para PostgreSQL.
+
+## Scripts Importantes
+
+### Frontend
+
+- `npm start`
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`
+- `npm run lint:fix`
+- `npm run format`
+- `npm run format:check`
+- `npm test`
+- `npm run test:watch`
+- `npm run test:ui`
+
+### API
+
+Dentro de [api/package.json](/home/candido/study/ia-engineer/ia-ecommerce-recomendations/api/package.json):
+
+- `npm run dev`
+- `npm run build`
+- `npm run prisma:generate`
+- `npm run prisma:migrate`
+- `npm run db:seed`
+
+## Testes e Qualidade
+
+O frontend possui suite automatizada com `Vitest`.
+
+Cobertura validada:
+
+- `86.52%` statements
+- `86.73%` branches
+- `80.99%` functions
+- `86.52%` lines
+
+Comandos:
 
 ```bash
-docker compose exec app bash
 npm test
+docker compose exec -T app npm test
+docker compose exec -T api npm run build
 ```
 
-## Observações
+## Validacao Ja Executada
 
-- o container já inclui ferramentas úteis de desenvolvimento como `bash`, `git`, `curl`, `procps`, `iproute2` e `net-tools`
-- o projeto foi configurado para desenvolvimento local e estudo, não para produção final
+Itens validados neste estado do projeto:
 
-fonte: Pós Graduação Engenharia de Software em IA Aplicada.  
+- `npm test`: OK
+- `npm run build`: OK
+- `cd api && npm run build`: OK
+- `docker compose up --build -d`: OK
+- `GET /health`: OK
+- `GET /api/products`: OK
+- `GET /api/users`: OK
+- `POST /api/users`: OK
+- `http://localhost:3000`: OK
+
+## Checklist da Entrega
+
+### Entregue
+
+- [x] separar frontend, API e banco
+- [x] adicionar `PostgreSQL` ao ambiente
+- [x] configurar `Prisma`
+- [x] criar schema relacional
+- [x] versionar migration inicial
+- [x] criar seed idempotente com dados fake
+- [x] expor endpoints de usuarios e produtos
+- [x] integrar frontend com API
+- [x] manter treino com `TensorFlow.js` no frontend
+- [x] manter interface responsiva
+- [x] validar stack completo com Docker
+- [x] manter cobertura do frontend acima de 80%
+
+### Proxima Etapa Recomendada
+
+- [ ] adicionar testes automatizados da API
+- [ ] criar camada de autenticacao
+- [ ] persistir historico de recomendacoes
+- [ ] versionar execucoes de treino
+- [ ] adicionar filtros, busca e paginação
+- [ ] criar pipeline CI/CD
+- [ ] instrumentar logs e observabilidade
+
+## Decisoes Tecnicas
+
+### Por que `PostgreSQL`?
+
+Porque o dominio e relacional:
+
+- usuario compra produto
+- produto participa de recomendacao
+- compras precisam ser persistidas
+- a modelagem tende a crescer bem com SQL
+
+### Por que `Prisma`?
+
+Porque ele oferece:
+
+- schema legivel
+- migrations versionadas
+- client tipado
+- seed consistente
+- boa integracao com `TypeScript`
+
+### Por que nao ligar o frontend direto no banco?
+
+Porque isso seria uma arquitetura incorreta para evolucao real.
+
+A API faz o papel certo de:
+
+- validar payload
+- aplicar regra de negocio
+- controlar persistencia
+- isolar o frontend da modelagem interna do banco
+
+## Limitacoes Conhecidas
+
+- o modelo de recomendacao ainda treina no navegador, nao no backend
+- a API ainda nao possui autenticacao
+- o bundle do frontend ainda e pesado por causa do `TensorFlow.js`
+- a API ainda nao possui suite de testes propria
+
+## Proximos Passos
+
+Se quisermos evoluir de forma profissional, a ordem mais natural agora e:
+
+1. adicionar testes da API
+2. criar persistencia de recomendacoes
+3. mover parte da inteligencia para backend quando fizer sentido
+4. adicionar autenticacao e perfis de acesso
+5. preparar pipeline de deploy
+
+fonte: Pós Graduação Engenharia de Software em IA Aplicada.
 Projeto de estudo
