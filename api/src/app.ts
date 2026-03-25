@@ -3,6 +3,7 @@ import express from 'express';
 import { ZodError } from 'zod';
 
 import { env } from './config/env';
+import { AppError } from './errors/AppError';
 import { productRoutes } from './modules/products/product.routes';
 import { userRoutes } from './modules/users/user.routes';
 
@@ -32,9 +33,23 @@ export function createApp() {
       return;
     }
 
-    if (error instanceof Error) {
-      response.status(400).json({
+    if (error instanceof AppError) {
+      response.status(error.statusCode).json({
         message: error.message
+      });
+      return;
+    }
+
+    if (error instanceof Error) {
+      response.status(500).json({
+        message: error.message
+      });
+      return;
+    }
+
+    if (typeof error === 'string') {
+      response.status(400).json({
+        message: error
       });
       return;
     }

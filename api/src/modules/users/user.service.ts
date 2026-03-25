@@ -1,3 +1,4 @@
+import { AppError } from '../../errors/AppError';
 import { prisma } from '../../lib/prisma';
 
 import { UserRepository, type UserWithPurchases } from './user.repository';
@@ -53,7 +54,7 @@ export class UserService {
     });
 
     if (count !== new Set(productIds).size) {
-      throw new Error('Um ou mais produtos informados nao existem.');
+      throw new AppError('Um ou mais produtos informados nao existem.', 400);
     }
   }
 
