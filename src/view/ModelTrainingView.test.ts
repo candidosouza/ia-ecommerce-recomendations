@@ -34,7 +34,7 @@ describe('ModelTrainingView', () => {
 
     view.updateTrainingProgress({ progress: 100 });
     expect(trainButton?.disabled).toBe(false);
-    expect(trainButton?.textContent).toContain('Train Recommendation Model');
+    expect(trainButton?.textContent).toContain('Treinar modelo');
 
     view.enableRecommendButton();
     expect(recommendationButton?.disabled).toBe(false);

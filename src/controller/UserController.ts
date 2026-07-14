@@ -1,3 +1,4 @@
+import { getErrorMessage } from '../utils/errors';
 import type Events from '../events/events';
 import type { UserService } from '../service/UserService';
 import type { Product, User } from '../types';
@@ -28,7 +29,9 @@ export class UserController {
 
   async renderUsers(nonTrainedUser: User) {
     const users = await this.#userService.getUsers();
-    const existingDemoUser = users.find((user) => user.name === nonTrainedUser.name);
+    const existingDemoUser = users.find(
+      (user) => user.name === nonTrainedUser.name && user.age === nonTrainedUser.age
+    );
     const demoUser = existingDemoUser ?? (await this.#userService.addUser(nonTrainedUser));
     const defaultAndNonTrained = [
       demoUser,
@@ -51,23 +54,38 @@ export class UserController {
   }
 
   private async handleUserSelect(userId: number) {
-    const user = await this.#userService.getUserById(userId);
-    if (!user) return;
+    try {
+      const user = await this.#userService.getUserById(userId);
+      if (!user) return;
 
-    this.#events.dispatchUserSelected(user);
-    this.displayUserDetails(user);
+      this.#events.dispatchUserSelected(user);
+      this.displayUserDetails(user);
+      this.#events.dispatchAppErrorCleared();
+    } catch (error) {
+      this.#events.dispatchAppError({
+        message: getErrorMessage(error, 'Nao foi possivel carregar o usuario selecionado.')
+      });
+    }
   }
 
   private async handlePurchaseAdded({ user, product }: { user: User; product: Product }) {
-    const updatedUser = await this.#userService.getUserById(user.id);
-    if (!updatedUser) return;
+    try {
+      const updatedUser = await this.#userService.getUserById(user.id);
+      if (!updatedUser) return;
 
-    updatedUser.purchases.push({ ...product });
-    await this.#userService.updateUser(updatedUser);
+      updatedUser.purchases.push({ ...product });
+      const persistedUser = await this.#userService.updateUser(updatedUser);
+      const users = await this.#userService.getUsers();
 
-    const lastPurchase = updatedUser.purchases[updatedUser.purchases.length - 1];
-    this.#userView.addPastPurchase(lastPurchase);
-    this.#events.dispatchUsersUpdated({ users: await this.#userService.getUsers() });
+      this.displayUserDetails(persistedUser);
+      this.#events.dispatchUserSelected(persistedUser);
+      this.#events.dispatchUsersUpdated({ users });
+      this.#events.dispatchAppErrorCleared();
+    } catch (error) {
+      this.#events.dispatchAppError({
+        message: getErrorMessage(error, 'Nao foi possivel registrar a compra.')
+      });
+    }
   }
 
   private async handlePurchaseRemove({
@@ -79,17 +97,26 @@ export class UserController {
   }) {
     if (!userId) return;
 
-    const user = await this.#userService.getUserById(userId);
-    if (!user) return;
+    try {
+      const user = await this.#userService.getUserById(userId);
+      if (!user) return;
 
-    const index = user.purchases.findIndex((item) => item.id === product.id);
-    if (index === -1) return;
+      const index = user.purchases.findIndex((item) => item.id === product.id);
+      if (index === -1) return;
 
-    user.purchases.splice(index, 1);
-    await this.#userService.updateUser(user);
+      user.purchases.splice(index, 1);
+      const persistedUser = await this.#userService.updateUser(user);
+      const updatedUsers = await this.#userService.getUsers();
 
-    const updatedUsers = await this.#userService.getUsers();
-    this.#events.dispatchUsersUpdated({ users: updatedUsers });
+      this.displayUserDetails(persistedUser);
+      this.#events.dispatchUserSelected(persistedUser);
+      this.#events.dispatchUsersUpdated({ users: updatedUsers });
+      this.#events.dispatchAppErrorCleared();
+    } catch (error) {
+      this.#events.dispatchAppError({
+        message: getErrorMessage(error, 'Nao foi possivel remover a compra.')
+      });
+    }
   }
 
   private displayUserDetails(user: User) {

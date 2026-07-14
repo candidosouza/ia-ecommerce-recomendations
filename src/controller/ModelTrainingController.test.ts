@@ -23,6 +23,8 @@ describe('ModelTrainingController', () => {
       getUserById: vi.fn()
     };
     const events = {
+      dispatchAppError: vi.fn(),
+      dispatchAppErrorCleared: vi.fn(),
       onUserSelected: vi.fn(),
       onTrainingComplete: vi.fn(),
       onUsersUpdated: vi.fn(),
@@ -61,6 +63,8 @@ describe('ModelTrainingController', () => {
       getUserById: vi.fn().mockResolvedValue(currentUser)
     };
     const events = {
+      dispatchAppError: vi.fn(),
+      dispatchAppErrorCleared: vi.fn(),
       onUserSelected: vi.fn(),
       onTrainingComplete: vi.fn(),
       onUsersUpdated: vi.fn(),
@@ -111,6 +115,8 @@ describe('ModelTrainingController', () => {
       getUserById: vi.fn().mockResolvedValue(currentUser)
     };
     const events = {
+      dispatchAppError: vi.fn(),
+      dispatchAppErrorCleared: vi.fn(),
       onUserSelected: vi.fn(),
       onTrainingComplete: vi.fn(),
       onUsersUpdated: vi.fn(),

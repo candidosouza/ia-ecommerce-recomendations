@@ -26,6 +26,8 @@ describe('UserController', () => {
     };
 
     const events = {
+      dispatchAppError: vi.fn(),
+      dispatchAppErrorCleared: vi.fn(),
       dispatchUsersUpdated: vi.fn(),
       onPurchaseAdded: vi.fn(),
       dispatchUserSelected: vi.fn()
@@ -68,6 +70,8 @@ describe('UserController', () => {
     };
 
     const events = {
+      dispatchAppError: vi.fn(),
+      dispatchAppErrorCleared: vi.fn(),
       dispatchUsersUpdated: vi.fn(),
       onPurchaseAdded: vi.fn(),
       dispatchUserSelected: vi.fn()
@@ -85,7 +89,8 @@ describe('UserController', () => {
     await purchaseAddedHandler({ user, product });
 
     expect(userService.updateUser).toHaveBeenCalled();
-    expect(userView.addPastPurchase).toHaveBeenCalledWith(product);
+    expect(userView.renderPastPurchases).toHaveBeenCalledWith([product]);
+    expect(events.dispatchUserSelected).toHaveBeenCalledWith({ ...user, purchases: [product] });
     expect(events.dispatchUsersUpdated).toHaveBeenCalled();
   });
 });

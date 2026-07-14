@@ -35,11 +35,11 @@ export class ModelView extends View {
 
     this.#trainModelBtn.disabled = true;
     this.#trainModelBtn.innerHTML =
-      '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Training...';
+      '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Treinando...';
 
     if (progress.progress === 100) {
       this.#trainModelBtn.disabled = false;
-      this.#trainModelBtn.innerHTML = 'Train Recommendation Model';
+      this.#trainModelBtn.innerHTML = '<i class="bi bi-cpu"></i> Treinar modelo';
     }
   }
 

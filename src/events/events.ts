@@ -23,6 +23,22 @@ export default class Events {
     document.dispatchEvent(new CustomEvent<T>(eventName, { detail: data }));
   }
 
+  static onAppError(callback: (data: { message: string }) => void) {
+    this.on(events.appError, callback);
+  }
+
+  static dispatchAppError(data: { message: string }) {
+    this.dispatch(events.appError, data);
+  }
+
+  static onAppErrorCleared(callback: (data: undefined) => void) {
+    this.on(events.appErrorCleared, callback);
+  }
+
+  static dispatchAppErrorCleared() {
+    this.dispatch(events.appErrorCleared, undefined);
+  }
+
   static onTrainingComplete(callback: (data: unknown) => void) {
     this.on(events.trainingComplete, callback);
   }

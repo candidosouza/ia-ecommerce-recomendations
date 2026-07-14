@@ -14,6 +14,8 @@ describe('ProductController', () => {
       getProducts: vi.fn().mockResolvedValue(products)
     };
     const events = {
+      dispatchAppError: vi.fn(),
+      dispatchAppErrorCleared: vi.fn(),
       onUserSelected: vi.fn(),
       onRecommendationsReady: vi.fn(),
       dispatchRecommend: vi.fn(),
@@ -44,6 +46,8 @@ describe('ProductController', () => {
       getProducts: vi.fn().mockResolvedValue([product])
     };
     const events = {
+      dispatchAppError: vi.fn(),
+      dispatchAppErrorCleared: vi.fn(),
       onUserSelected: vi.fn(),
       onRecommendationsReady: vi.fn(),
       dispatchRecommend: vi.fn(),

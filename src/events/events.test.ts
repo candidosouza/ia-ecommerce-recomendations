@@ -31,4 +31,14 @@ describe('Events', () => {
 
     expect(callback).toHaveBeenCalledWith(payload);
   });
+
+  it('dispatcha e escuta app:error', () => {
+    const callback = vi.fn();
+    const payload = { message: 'Falha de API' };
+
+    Events.onAppError(callback);
+    Events.dispatchAppError(payload);
+
+    expect(callback).toHaveBeenCalledWith(payload);
+  });
 });

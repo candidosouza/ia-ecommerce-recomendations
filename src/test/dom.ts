@@ -1,5 +1,6 @@
 export function mountAppDom() {
   document.body.innerHTML = `
+    <div id="appFeedback"></div>
     <select id="userSelect"></select>
     <input id="userAge" />
     <div id="pastPurchasesList"></div>

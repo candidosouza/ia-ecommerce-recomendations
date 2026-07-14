@@ -1,3 +1,4 @@
+import { getErrorMessage } from '../utils/errors';
 import type Events from '../events/events';
 import type { ProductService } from '../service/ProductService';
 import type { Product, User } from '../types';
@@ -35,8 +36,15 @@ export class ProductController {
   private async init() {
     this.setupCallbacks();
     this.setupEventListeners();
-    const products = await this.#productService.getProducts();
-    this.#productView.render(products, true);
+    try {
+      const products = await this.#productService.getProducts();
+      this.#productView.render(products, true);
+      this.#events.dispatchAppErrorCleared();
+    } catch (error) {
+      this.#events.dispatchAppError({
+        message: getErrorMessage(error, 'Nao foi possivel carregar o catalogo de produtos.')
+      });
+    }
   }
 
   private setupEventListeners() {

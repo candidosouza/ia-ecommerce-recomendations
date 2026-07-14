@@ -1,3 +1,4 @@
+import { getErrorMessage } from '../utils/errors';
 import type Events from '../events/events';
 import type { ProductService } from '../service/ProductService';
 import type { UserService } from '../service/UserService';
@@ -66,9 +67,16 @@ export class ModelController {
   }
 
   private async handleTrainModel() {
-    const users = await this.#userService.getUsers();
-    const products = await this.#productService.getProducts();
-    this.#events.dispatchTrainModel({ users, products });
+    try {
+      const users = await this.#userService.getUsers();
+      const products = await this.#productService.getProducts();
+      this.#events.dispatchTrainModel({ users, products });
+      this.#events.dispatchAppErrorCleared();
+    } catch (error) {
+      this.#events.dispatchAppError({
+        message: getErrorMessage(error, 'Nao foi possivel iniciar o treinamento do modelo.')
+      });
+    }
   }
 
   private handleTrainingProgressUpdate(progress: TrainingProgress) {
@@ -78,9 +86,16 @@ export class ModelController {
   private async handleRunRecommendation() {
     if (!this.#currentUser) return;
 
-    const updatedUser = await this.#userService.getUserById(this.#currentUser.id);
-    if (updatedUser) {
-      this.#events.dispatchRecommend(updatedUser);
+    try {
+      const updatedUser = await this.#userService.getUserById(this.#currentUser.id);
+      if (updatedUser) {
+        this.#events.dispatchRecommend(updatedUser);
+        this.#events.dispatchAppErrorCleared();
+      }
+    } catch (error) {
+      this.#events.dispatchAppError({
+        message: getErrorMessage(error, 'Nao foi possivel gerar a recomendacao.')
+      });
     }
   }
 

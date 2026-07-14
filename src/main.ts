@@ -1,4 +1,5 @@
 import '../style.css';
+import { AppFeedbackController } from './controller/AppFeedbackController';
 import { ModelController } from './controller/ModelTrainingController';
 import { ProductController } from './controller/ProductController';
 import { TFVisorController } from './controller/TFVisorController';
@@ -7,6 +8,7 @@ import { WorkerController } from './controller/WorkerController';
 import Events from './events/events';
 import { ProductService } from './service/ProductService';
 import { UserService } from './service/UserService';
+import { AppFeedbackView } from './view/AppFeedbackView';
 import { ModelView } from './view/ModelTrainingView';
 import { ProductView } from './view/ProductView';
 import { TFVisorView } from './view/TFVisorView';
@@ -17,6 +19,7 @@ import type { User } from './types';
 const userService = new UserService();
 const productService = new ProductService();
 
+const appFeedbackView = new AppFeedbackView();
 const userView = new UserView();
 const productView = new ProductView();
 const modelView = new ModelView();
@@ -26,6 +29,11 @@ const mlWorker = new Worker(new URL('./workers/modelTrainingWorker.ts', import.m
 });
 
 async function bootstrap() {
+  AppFeedbackController.init({
+    view: appFeedbackView,
+    events: Events
+  });
+
   WorkerController.init({
     worker: mlWorker,
     events: Events
@@ -62,7 +70,15 @@ async function bootstrap() {
     purchases: []
   };
 
-  await userController.renderUsers(demoUser);
+  try {
+    await userController.renderUsers(demoUser);
+    Events.dispatchAppErrorCleared();
+  } catch (error) {
+    Events.dispatchAppError({
+      message:
+        error instanceof Error ? error.message : 'Nao foi possivel inicializar a aplicacao.'
+    });
+  }
 }
 
 void bootstrap();

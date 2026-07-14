@@ -1,4 +1,6 @@
 export const events = {
+  appError: 'app:error',
+  appErrorCleared: 'app:error-cleared',
   userSelected: 'user:selected',
   usersUpdated: 'users:updated',
   purchaseAdded: 'purchase:added',
